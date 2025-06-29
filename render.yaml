@@ -6,4 +6,5 @@ services:
     plan: free
     branch: main
     dockerContext: ./backend
-    dockerfilePath: ./backend/docker-compose.yml
+    dockerfilePath: ./backend/Dockerfile
+
