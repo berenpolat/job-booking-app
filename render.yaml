@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: job-booking-app
+    env: docker
+    repo: https://github.com/berenpolat/job-booking-app
+    plan: free
+    branch: main
+    dockerContext: ./backend
+    dockerfilePath: ./backend/docker-compose.yml
