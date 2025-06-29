@@ -1,0 +1,127 @@
+version: '3.8'
+services:
+  job-service:
+    build: ./job-service
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/jobs
+    depends_on:
+      - mongo
+
+  hotel-service:
+    build: ./hotel-service
+    ports:
+      - "5002:5002"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hotels
+    depends_on:
+      - mongo
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - rabbitmq
+
+  ai-agent-service:
+    build: ./ai-agent-service
+    ports:
+      - "5004:5004"
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+version: "3.9"
+services:
+  job-service:
+    build: ./backend/job-service
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/jobs
+    depends_on:
+      - mongo
+
+  hotel-service:
+    build: ./backend/hotel-service
+    ports:
+      - "5002:5002"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hotels
+    depends_on:
+      - mongo
+
+  ai-agent-service:
+    build: ./backend/ai-agent-service
+    ports:
+      - "5004:5004"
+    environment:
+      - HOTEL_API=http://hotel-service:5002/api/v1/hotels
+      - JOB_API=http://job-service:5001/api/v1/jobs
+
+  notification-service:
+    build: ./backend/notification-service
+    ports:
+      - "5003:5003"
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+      - MONGO_HOTEL_URL=mongodb://mongo:27017/hotels
+      - MONGO_JOB_URL=mongodb://mongo:27017/jobs
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - JOB_SERVICE=http://job-service:5001
+      - HOTEL_SERVICE=http://hotel-service:5002
+      - AI_SERVICE=http://ai-agent-service:5004
+
+  frontend:
+    build:
+      context: ./frontend/job-booking-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_BASE=http://api-gateway:8080/api/v1
+    depends_on:
+      - api-gateway
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
