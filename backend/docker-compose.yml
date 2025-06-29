@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  job-service:
+    build: ./job-service
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/jobs
+    depends_on:
+      - mongo
+
+  hotel-service:
+    build: ./hotel-service
+    ports:
+      - "5002:5002"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hotels
+    depends_on:
+      - mongo
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - rabbitmq
+
+  ai-agent-service:
+    build: ./ai-agent-service
+    ports:
+      - "5004:5004"
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
