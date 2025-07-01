@@ -1,3 +1,5 @@
+// backend/job-service/controllers/jobController.js
+
 const Job = require("../models/Job");
 
 exports.getAllJobs = async (req, res) => {
